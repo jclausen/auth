@@ -31,6 +31,10 @@ abstract class Kohana_Auth {
 			}
 
 			// Set the session class name
+			// Make sure our case matches for Linux
+			if($type=='orm')
+				$type=strtoupper($type);
+			
 			$class = 'Auth_'.ucfirst($type);
 
 			// Create a new session instance
