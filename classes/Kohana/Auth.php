@@ -78,7 +78,7 @@ abstract class Kohana_Auth {
 	public function get_user($default = NULL)
 	{
 		$user=$this->_session->get($this->_config['session_key'], $default);
-		if(is_array($user) && array_key_exists('id',$user) && $this->_config['driver']=='orm'){
+		if(is_array($user) and array_key_exists('id',$user) and $this->_config['driver']=='orm'){
 			$user=ORM::factory('User',$user['id']);
 			if($user->loaded()){
 				return $user;
