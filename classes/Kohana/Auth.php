@@ -31,6 +31,10 @@ abstract class Kohana_Auth {
 			}
 
 			// Set the session class name
+			// Make sure our case matches for Linux
+			if($type=='orm')
+				$type=strtoupper($type);
+			
 			$class = 'Auth_'.ucfirst($type);
 
 			// Create a new session instance
@@ -73,7 +77,17 @@ abstract class Kohana_Auth {
 	 */
 	public function get_user($default = NULL)
 	{
-		return $this->_session->get($this->_config['session_key'], $default);
+		$user=$this->_session->get($this->_config['session_key'], $default);
+		if(is_array($user) and array_key_exists('id',$user) and $this->_config['driver']=='orm'){
+			$user=ORM::factory('User',$user['id']);
+			if($user->loaded()){
+				return $user;
+			} else {
+				return $default;
+			}
+		} else {
+			return $this->_session->get($this->_config['session_key'], $default);
+		}
 	}
 
 	/**
@@ -159,6 +173,10 @@ abstract class Kohana_Auth {
 
 	protected function complete_login($user)
 	{
+		// Make sure our user is PHP native session safe
+		if($this->_config['driver']=='orm'){
+			$user=$user->as_array();
+		}		
 		// Regenerate session_id
 		$this->_session->regenerate();
 
